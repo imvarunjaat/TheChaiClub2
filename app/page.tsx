@@ -1,8 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import Head from 'next/head';
+import AuthModal from './components/AuthModal';
 
 interface ChatRoomCardProps {
   title: string;
@@ -100,6 +101,8 @@ function ChaiCup({ opacity }: ChaiCupProps) {
 }
 
 export default function Home() {
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+  
   useEffect(() => {
     // Update viewport meta tag for better mobile responsiveness
     const meta = document.createElement('meta');
@@ -167,13 +170,18 @@ export default function Home() {
             TheChaiClub
           </h1>
           <div className="flex items-center gap-2 sm:gap-4">
-            <Image 
-              src="https://randomuser.me/api/portraits/women/79.jpg"
-              alt="User Avatar"
-              width={36}
-              height={36}
-              className="rounded-full border-2 border-[#f9c7c7] shadow-md"
-            />
+            <button 
+              onClick={() => setAuthModalOpen(true)}
+              className="flex items-center gap-1 sm:gap-2 cursor-pointer hover:scale-105 transition-transform group"
+              aria-label="Login or sign up"
+            >
+              <div className="relative w-9 h-9 rounded-full bg-[#fbeee0] flex items-center justify-center border-2 border-[#f9c7c7] shadow-md overflow-hidden">
+                <svg className="w-5 h-5 text-[#593A27] group-hover:text-[#f9c7c7] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+              </div>
+              <span className="text-xs font-medium text-[#593A27] hidden sm:block group-hover:text-[#f9c7c7] transition-colors">Sign In</span>
+            </button>
           </div>
         </header>
 
@@ -248,6 +256,9 @@ export default function Home() {
           </section>
         </main>
       </div>
+      
+      {/* Auth Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setAuthModalOpen(false)} />
     </div>
   );
 } 
