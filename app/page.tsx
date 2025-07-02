@@ -4,6 +4,9 @@ import Image from 'next/image';
 import { ReactNode, useEffect, useState } from 'react';
 import Head from 'next/head';
 import AuthModal from './components/AuthModal';
+import RoomsScreen from './components/RoomsScreen';
+import ChatsScreen from './components/ChatsScreen';
+import ParticlesBackground from './components/ParticlesBackground';
 
 interface ChatRoomCardProps {
   title: string;
@@ -18,7 +21,7 @@ interface ChatRoomCardProps {
 // Component for Chat Room Cards
 function ChatRoomCard({ title, description, onlineCount, icon, gradient, textColor, buttonColor }: ChatRoomCardProps) {
   return (
-    <div className={`flex flex-col bg-gradient-to-br ${gradient} rounded-2xl sm:rounded-3xl shadow-lg p-3 sm:p-5 md:p-7 transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl border border-[#faede4] group relative overflow-hidden mobile-card mobile-fade-in w-full`}>
+    <div className={`flex flex-col bg-gradient-to-br ${gradient} rounded-2xl sm:rounded-3xl shadow-lg p-3 sm:p-5 md:p-7 transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl border border-[#faede4] group relative overflow-hidden mobile-card mobile-fade-in w-full h-full`}>
       <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-5 -mr-6 -mt-6 bg-current"></div>
       <div className="flex items-center gap-1.5 sm:gap-4 mb-2 sm:mb-4">
         <span className={`${buttonColor} rounded-full p-1.5 sm:p-3 transition-transform duration-300 group-hover:scale-110 shadow-md`}>
@@ -102,6 +105,12 @@ function ChaiCup({ opacity }: ChaiCupProps) {
 
 export default function Home() {
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+  const [activeView, setActiveView] = useState<'home' | 'rooms' | 'chats'>('home');
+  
+  // Function to handle navigation changes
+  const handleNavigation = (view: 'home' | 'rooms' | 'chats') => {
+    setActiveView(view);
+  };
   
   useEffect(() => {
     // Update viewport meta tag for better mobile responsiveness
@@ -116,149 +125,173 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col sm:flex-row min-h-screen max-w-[100vw] overflow-x-hidden">
-      {/* Sidebar */}
-      <aside className="w-full sm:w-16 md:w-20 bg-white/70 backdrop-blur-lg flex sm:flex-col items-center justify-between sm:justify-start sm:rounded-r-3xl py-2 sm:py-8 shadow-xl border-b sm:border-b-0 sm:border-r border-[#fbeee0] z-10 sticky top-0 sm:relative mobile-glass">
-        <div className="sm:mb-12">
-          <Image 
-            src="https://i.imgur.com/5ksRGJ4.png" 
-            alt="TheChaiClub Logo" 
-            width={40} 
-            height={40} 
-            className="rounded-full shadow-md"
-          />
-        </div>
-        <nav className="flex sm:flex-col space-x-4 sm:space-x-0 sm:space-y-8 items-center smooth-scroll">
-          <button title="Home" className="focus:outline-none hover:scale-110 transition mobile-nav-item active touch-target flex flex-col items-center">
-            <svg className="w-7 h-7" fill="none" stroke="#593A27" strokeWidth="1.7" viewBox="0 0 24 24"><path d="M3 12L12 4l9 8"></path><path d="M9 21V12h6v9"></path></svg>
-            <span className="text-xs font-medium mt-1 text-[#593A27] sm:block hidden">Home</span>
-            <span className="text-[10px] font-medium mt-0.5 text-[#593A27] block sm:hidden">Home</span>
-          </button>
-          <button title="Chat Rooms" className="focus:outline-none hover:scale-110 transition mobile-nav-item touch-target flex flex-col items-center">
-            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-7 h-7">
-              <ellipse cx="14" cy="18" rx="7" ry="5" fill="#fbeee0" stroke="#593A27" strokeWidth="1.5"/>
-              <path d="M21 17c2 0 4 1 4 3s-2 3-4 3" stroke="#593A27" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-              <path d="M7 18c-2 0-3-2-2-3" stroke="#593A27" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-              <ellipse cx="14" cy="13" rx="4" ry="1.2" fill="#fbeee0" stroke="#593A27" strokeWidth="1.2"/>
-              <path d="M24 19c.5 1.5 2 2 2 2" stroke="#593A27" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
-              <rect x="22.5" y="22" width="6" height="4" rx="2" fill="#fbeee0" stroke="#593A27" strokeWidth="1.2"/>
-              <path d="M25 26v2l2-2" stroke="#593A27" strokeWidth="1.2" strokeLinecap="round"/>
-              <rect x="16" y="25" width="5" height="3" rx="1.5" fill="#fbeee0" stroke="#593A27" strokeWidth="1.2"/>
-              <path d="M18 28v1l1.5-1" stroke="#593A27" strokeWidth="1.2" strokeLinecap="round"/>
-            </svg>
-            <span className="text-xs font-medium mt-1 text-[#593A27] sm:block hidden">Rooms</span>
-            <span className="text-[10px] font-medium mt-0.5 text-[#593A27] block sm:hidden">Rooms</span>
-          </button>
-          <button title="My Chats" className="focus:outline-none hover:scale-110 transition mobile-nav-item touch-target flex flex-col items-center">
-            <svg className="w-7 h-7" fill="none" stroke="#593A27" strokeWidth="1.7" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h12a2 2 0 012 2z"></path></svg>
-            <span className="text-xs font-medium mt-1 text-[#593A27] sm:block hidden">Chats</span>
-            <span className="text-[10px] font-medium mt-0.5 text-[#593A27] block sm:hidden">Chats</span>
-          </button>
-
-        </nav>
-        <div className="sm:mt-auto sm:pt-10 hidden sm:block">
-          <span className="text-xs text-[#b89e8f]">v1.0</span>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col w-full">
-        {/* Top Navbar */}
-        <header className="w-full flex flex-wrap justify-between items-center px-3 sm:px-6 md:px-8 py-2 sm:py-4 bg-white/70 backdrop-blur-lg shadow-sm sm:rounded-bl-3xl border-b border-[#fbeee0] sticky top-[50px] sm:top-0 z-[5] mobile-glass">
-          <h1 className="text-lg sm:text-2xl md:text-3xl font-bold tracking-tight text-[#593A27] flex items-center gap-1 sm:gap-2">
-            <svg className="w-6 h-6 sm:w-7 sm:h-7 text-[#f9c7c7]" fill="currentColor" viewBox="0 0 20 20"><path d="M4 5a2 2 0 012-2h8a2 2 0 012 2v7a2 2 0 01-2 2h-1v2.382a1 1 0 01-1.447.894l-2.106-1.053A1 1 0 018 16V14H6a2 2 0 01-2-2V5z"/></svg>
-            TheChaiClub
-          </h1>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <button 
-              onClick={() => setAuthModalOpen(true)}
-              className="flex items-center gap-1 sm:gap-2 cursor-pointer hover:scale-105 transition-transform group"
-              aria-label="Login or sign up"
-            >
-              <div className="relative w-9 h-9 rounded-full bg-[#fbeee0] flex items-center justify-center border-2 border-[#f9c7c7] shadow-md overflow-hidden">
-                <svg className="w-5 h-5 text-[#593A27] group-hover:text-[#f9c7c7] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
-              </div>
-              <span className="text-xs font-medium text-[#593A27] hidden sm:block group-hover:text-[#f9c7c7] transition-colors">Sign In</span>
-            </button>
-          </div>
-        </header>
-
-        <main className="flex-1 grid xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-3 sm:gap-6 md:gap-8 p-2 sm:p-4 md:p-8 md:pt-8 smooth-scroll overflow-x-hidden">
-          {/* Chat Rooms & Join Button */}
-          <section className="xl:col-span-2 lg:col-span-2 md:col-span-2 flex flex-col">
-            <div className="flex items-center justify-between mb-3 sm:mb-4 flex-wrap gap-2">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-[#6e4e36]">Featured Chat Rooms</h2>
-              <button className="glow-btn bg-gradient-to-r from-[#f9c7c7] via-[#fbeee0] to-[#b89e8f] text-[#593A27] px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold shadow-lg transition transform hover:scale-105 focus:outline-none mobile-btn">
-                + Join Room
+    <>
+      <ParticlesBackground />
+      <div className="relative z-0"> 
+        <div className="flex flex-col sm:flex-row min-h-screen max-w-[100vw] overflow-x-hidden">
+          {/* Sidebar */}
+          <aside className="w-full sm:w-16 md:w-20 bg-white/70 backdrop-blur-lg flex sm:flex-col items-center justify-between sm:justify-start sm:rounded-r-3xl py-2 sm:py-8 shadow-xl border-b sm:border-b-0 sm:border-r border-[#fbeee0] z-10 sticky top-0 sm:relative mobile-glass">
+            <div className="sm:mb-12">
+              <Image 
+                src="https://i.imgur.com/5ksRGJ4.png" 
+                alt="TheChaiClub Logo" 
+                width={40} 
+                height={40} 
+                className="rounded-full shadow-md"
+              />
+            </div>
+            <nav className="flex sm:flex-col space-x-4 sm:space-x-0 sm:space-y-8 items-center smooth-scroll">
+              <button 
+                title="Home" 
+                onClick={() => handleNavigation('home')}
+                className={`focus:outline-none hover:scale-110 transition mobile-nav-item touch-target flex flex-col items-center ${activeView === 'home' ? 'active' : ''}`}
+              >
+                <svg className="w-7 h-7" fill="none" stroke="#593A27" strokeWidth="1.7" viewBox="0 0 24 24"><path d="M3 12L12 4l9 8"></path><path d="M9 21V12h6v9"></path></svg>
+                <span className="text-xs font-medium mt-1 text-[#593A27] sm:block hidden">Home</span>
+                <span className="text-[10px] font-medium mt-0.5 text-[#593A27] block sm:hidden">Home</span>
               </button>
+              <button 
+                title="Chat Rooms" 
+                onClick={() => handleNavigation('rooms')}
+                className={`focus:outline-none hover:scale-110 transition mobile-nav-item touch-target flex flex-col items-center ${activeView === 'rooms' ? 'active' : ''}`}
+              >
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-7 h-7">
+                  <ellipse cx="14" cy="18" rx="7" ry="5" fill="#fbeee0" stroke="#593A27" strokeWidth="1.5"/>
+                  <path d="M21 17c2 0 4 1 4 3s-2 3-4 3" stroke="#593A27" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                  <path d="M7 18c-2 0-3-2-2-3" stroke="#593A27" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                  <ellipse cx="14" cy="13" rx="4" ry="1.2" fill="#fbeee0" stroke="#593A27" strokeWidth="1.2"/>
+                  <path d="M24 19c.5 1.5 2 2 2 2" stroke="#593A27" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+                  <rect x="22.5" y="22" width="6" height="4" rx="2" fill="#fbeee0" stroke="#593A27" strokeWidth="1.2"/>
+                  <path d="M25 26v2l2-2" stroke="#593A27" strokeWidth="1.2" strokeLinecap="round"/>
+                  <rect x="16" y="25" width="5" height="3" rx="1.5" fill="#fbeee0" stroke="#593A27" strokeWidth="1.2"/>
+                  <path d="M18 28v1l1.5-1" stroke="#593A27" strokeWidth="1.2" strokeLinecap="round"/>
+                </svg>
+                <span className="text-xs font-medium mt-1 text-[#593A27] sm:block hidden">Rooms</span>
+                <span className="text-[10px] font-medium mt-0.5 text-[#593A27] block sm:hidden">Rooms</span>
+              </button>
+              <button 
+                title="My Chats" 
+                onClick={() => handleNavigation('chats')}
+                className={`focus:outline-none hover:scale-110 transition mobile-nav-item touch-target flex flex-col items-center ${activeView === 'chats' ? 'active' : ''}`}
+              >
+                <svg className="w-7 h-7" fill="none" stroke="#593A27" strokeWidth="1.7" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h12a2 2 0 012 2z"></path></svg>
+                <span className="text-xs font-medium mt-1 text-[#593A27] sm:block hidden">Chats</span>
+                <span className="text-[10px] font-medium mt-0.5 text-[#593A27] block sm:hidden">Chats</span>
+              </button>
+
+            </nav>
+            <div className="sm:mt-auto sm:pt-10 hidden sm:block">
+              <span className="text-xs text-[#b89e8f]">v1.0</span>
             </div>
-            {/* Responsive Room Grid */}
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 xl:gap-12 pb-8">
-              {/* Chat Room Cards */}
-              <ChatRoomCard 
-                title="First Year Feels"
-                description="Share your freshie confessions, college hacks & awkward stories."
-                onlineCount={124}
-                icon={<svg className="w-6 h-6 text-[#a07764]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/><circle cx="12" cy="11" r="8"/></svg>}
-                gradient="from-[#fff5f2] to-[#f9c7c7]/40"
-                textColor="text-[#a07764]"
-                buttonColor="bg-[#f9c7c7] hover:bg-[#fbeee0]"
-              />
-              <ChatRoomCard 
-                title="Breakup"
-                description="Heartbreaks, healing, and moving on – talk it out with others who get it."
-                onlineCount={67}
-                icon={<svg className="w-6 h-6 text-[#e85a71]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 3C21 8 12 21 12 21S3 8 8 3c2.5-2.5 5.5-2.5 8 0z"/></svg>}
-                gradient="from-[#fde5ec] to-[#faede4]"
-                textColor="text-[#e85a71]"
-                buttonColor="bg-[#fde5ec] hover:bg-[#f9c7c7]"
-              />
-              {/* Add more ChatRoomCard components for other rooms */}
-              <ChatRoomCard 
-                title="Hangout"
-                description="Meet, chill, and vibe with new friends – virtual chai, anyone?"
-                onlineCount={102}
-                icon={<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M17.5 17.5L22 22"/></svg>}
-                gradient="from-[#fbeee0] via-[#e2f6ef] to-[#fff5f2]"
-                textColor="text-[#35b8a6]"
-                buttonColor="bg-[#e2f6ef] hover:bg-[#fbeee0]"
-              />
-              <ChatRoomCard 
-                title="Gossips"
-                description="Spill the tea, share campus news, or just enjoy some harmless gossip!"
-                onlineCount={80}
-                icon={<svg className="w-6 h-6 text-[#b89e8f]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="7"/><ellipse cx="12" cy="12" rx="6" ry="3"/></svg>}
-                gradient="from-[#f9c7c7]/70 via-[#fffbe9] to-[#ffe8c7]"
-                textColor="text-[#b89e8f]"
-                buttonColor="bg-[#ffe066]/70 hover:bg-[#fffbe9]"
-              />
-              <ChatRoomCard 
-                title="Exam Burnout Café"
-                description="Vent, share memes or find a study buddy during exam szn."
-                onlineCount={89}
-                icon={<svg className="w-6 h-6 text-[#fff5f2]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>}
-                gradient="from-[#fbeee0] to-[#ede7fe]"
-                textColor="text-[#a07764]"
-                buttonColor="bg-[#ede7fe] hover:bg-[#fbeee0]"
-              />
-              <ChatRoomCard 
-                title="Hostel Heartbreak Club"
-                description="Love, situationships, friendships, breakups - no judgements here."
-                onlineCount={56}
-                icon={<svg className="w-6 h-6 text-[#e85a71]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 21C12 21 7 14.5 7 10a5 5 0 1110 0c0 4.5-5 11-5 11z"/></svg>}
-                gradient="from-[#faede4] via-[#f9c7c7]/30 to-[#fff5f2]"
-                textColor="text-[#e85a71]"
-                buttonColor="bg-[#fbeee0] hover:bg-[#f9c7c7]"
-              />
+          </aside>
+
+          {/* Main Content Area with Sliding Views */}
+          <div className="flex-1 flex flex-col w-full relative overflow-hidden">  
+            {/* Chats Screen (Sliding Panel) */}
+            <div className={`absolute top-0 left-0 right-0 bottom-0 bg-white transform transition-transform duration-300 ease-in-out z-20 ${activeView === 'chats' ? 'translate-x-0' : 'translate-x-full'}`}>
+              <ChatsScreen />
             </div>
-          </section>
-        </main>
+            {/* Rooms Screen (Sliding Panel) */}
+            <div className={`absolute top-0 left-0 right-0 bottom-0 bg-white transform transition-transform duration-300 ease-in-out z-20 ${activeView === 'rooms' ? 'translate-x-0' : 'translate-x-full'}`}>
+              <RoomsScreen />
+            </div>
+            {/* Top Navbar */}
+            <header className="w-full flex flex-wrap justify-between items-center px-3 sm:px-6 md:px-8 py-2 sm:py-4 bg-white/70 backdrop-blur-lg shadow-sm sm:rounded-bl-3xl border-b border-[#fbeee0] sticky top-[50px] sm:top-0 z-[5] mobile-glass">
+              <h1 className="text-lg sm:text-2xl md:text-3xl font-bold tracking-tight text-[#593A27] flex items-center gap-1 sm:gap-2">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7 text-[#f9c7c7]" fill="currentColor" viewBox="0 0 20 20"><path d="M4 5a2 2 0 012-2h8a2 2 0 012 2v7a2 2 0 01-2 2h-1v2.382a1 1 0 01-1.447.894l-2.106-1.053A1 1 0 018 16V14H6a2 2 0 01-2-2V5z"/></svg>
+                TheChaiClub
+              </h1>
+              <div className="flex items-center gap-2 sm:gap-4">
+                <button 
+                  onClick={() => setAuthModalOpen(true)}
+                  className="flex items-center gap-1 sm:gap-2 cursor-pointer hover:scale-105 transition-transform group"
+                  aria-label="Login or sign up"
+                >
+                  <div className="relative w-9 h-9 rounded-full bg-[#fbeee0] flex items-center justify-center border-2 border-[#f9c7c7] shadow-md overflow-hidden">
+                    <svg className="w-5 h-5 text-[#593A27] group-hover:text-[#f9c7c7] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0c0 4.5-5 11-5 11z"/></svg>
+                  </div>
+                  <span className="text-xs font-medium text-[#593A27] hidden sm:block group-hover:text-[#f9c7c7] transition-colors">Sign In</span>
+                </button>
+              </div>
+            </header>
+
+            <main className={`flex-1 w-full p-2 sm:p-4 md:p-6 lg:p-8 smooth-scroll overflow-x-hidden transition-opacity duration-300 ${activeView === 'home' ? 'opacity-100' : 'opacity-0'}`}>
+              {/* Chat Rooms & Join Button */}
+              <section className="w-full flex flex-col">
+                <div className="flex items-center justify-between mb-3 sm:mb-4 flex-wrap gap-2">
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-[#6e4e36]">Featured Chat Rooms</h2>
+                  <button className="glow-btn bg-gradient-to-r from-[#f9c7c7] via-[#fbeee0] to-[#b89e8f] text-[#593A27] px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold shadow-lg transition transform hover:scale-105 focus:outline-none mobile-btn">
+                    + Join Room
+                  </button>
+                </div>
+                {/* Responsive Room Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 w-full pb-8">
+                  {/* Chat Room Cards */}
+                  <ChatRoomCard 
+                    title="First Year Feels"
+                    description="Share your freshie confessions, college hacks & awkward stories."
+                    onlineCount={124}
+                    icon={<svg className="w-6 h-6 text-[#a07764]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 012 2h12a2 2 0 012-2v-2"/><circle cx="12" cy="11" r="8"/></svg>}
+                    gradient="from-[#fff5f2] to-[#f9c7c7]/40"
+                    textColor="text-[#a07764]"
+                    buttonColor="bg-[#f9c7c7] hover:bg-[#fbeee0]"
+                  />
+                  <ChatRoomCard 
+                    title="Breakup"
+                    description="Heartbreaks, healing, and moving on – talk it out with others who get it."
+                    onlineCount={67}
+                    icon={<svg className="w-6 h-6 text-[#e85a71]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 3C21 8 12 21 12 21S3 8 8 3c2.5-2.5 5.5-2.5 8 0z"/></svg>}
+                    gradient="from-[#fde5ec] to-[#faede4]"
+                    textColor="text-[#e85a71]"
+                    buttonColor="bg-[#fde5ec] hover:bg-[#f9c7c7]"
+                  />
+                  {/* Add more ChatRoomCard components for other rooms */}
+                  <ChatRoomCard 
+                    title="Hangout"
+                    description="Meet, chill, and vibe with new friends – virtual chai, anyone?"
+                    onlineCount={102}
+                    icon={<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M17.5 17.5L22 22"/></svg>}
+                    gradient="from-[#fbeee0] via-[#e2f6ef] to-[#fff5f2]"
+                    textColor="text-[#35b8a6]"
+                    buttonColor="bg-[#e2f6ef] hover:bg-[#fbeee0]"
+                  />
+                  <ChatRoomCard 
+                    title="Gossips"
+                    description="Spill the tea, share campus news, or just enjoy some harmless gossip!"
+                    onlineCount={80}
+                    icon={<svg className="w-6 h-6 text-[#b89e8f]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="7"/><ellipse cx="12" cy="12" rx="6" ry="3"/></svg>}
+                    gradient="from-[#f9c7c7]/70 via-[#fffbe9] to-[#ffe8c7]"
+                    textColor="text-[#b89e8f]"
+                    buttonColor="bg-[#ffe066]/70 hover:bg-[#fffbe9]"
+                  />
+                  <ChatRoomCard 
+                    title="Exam Burnout Café"
+                    description="Vent, share memes or find a study buddy during exam szn."
+                    onlineCount={89}
+                    icon={<svg className="w-6 h-6 text-[#fff5f2]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>}
+                    gradient="from-[#fbeee0] to-[#ede7fe]"
+                    textColor="text-[#a07764]"
+                    buttonColor="bg-[#ede7fe] hover:bg-[#fbeee0]"
+                  />
+                  <ChatRoomCard 
+                    title="Hostel Heartbreak Club"
+                    description="Love, situationships, friendships, breakups - no judgements here."
+                    onlineCount={56}
+                    icon={<svg className="w-6 h-6 text-[#e85a71]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 21C12 21 7 14.5 7 10a5 5 0 1110 0c0 4.5-5 11-5 11z"/></svg>}
+                    gradient="from-[#faede4] via-[#f9c7c7]/30 to-[#fff5f2]"
+                    textColor="text-[#e85a71]"
+                    buttonColor="bg-[#fbeee0] hover:bg-[#f9c7c7]"
+                  />
+                </div>
+              </section>
+            </main>
+          </div>
+          
+          {/* Auth Modal */}
+          <AuthModal isOpen={isAuthModalOpen} onClose={() => setAuthModalOpen(false)} />
+        </div>
       </div>
-      
-      {/* Auth Modal */}
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setAuthModalOpen(false)} />
-    </div>
+    </>
   );
 } 
