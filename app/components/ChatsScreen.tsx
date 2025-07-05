@@ -4,13 +4,17 @@ import Image from 'next/image';
 import { useState } from 'react';
 
 interface ChatItemProps {
+  id: string;
   name: string;
   lastMessage: string;
   time: string;
   avatar: string;
+  isRequest?: boolean;
+  onAccept?: (id: string) => void;
+  onReject?: (id: string) => void;
 }
 
-const ChatItem = ({ name, lastMessage, time, avatar }: ChatItemProps) => {
+const ChatItem = ({ id, name, lastMessage, time, avatar, isRequest, onAccept, onReject }: ChatItemProps) => {
   return (
     <div className="flex items-center p-3 hover:bg-[#fbeee0]/50 rounded-xl transition-all duration-200 cursor-pointer active:bg-[#fbeee0]/70">
       <div className="relative">
@@ -28,6 +32,22 @@ const ChatItem = ({ name, lastMessage, time, avatar }: ChatItemProps) => {
           <span className="text-xs text-[#b89e8f] ml-2 whitespace-nowrap">{time}</span>
         </div>
         <p className="text-sm text-[#6e4e36] truncate">{lastMessage}</p>
+        {isRequest && (
+          <div className="flex mt-2 space-x-2">
+            <button 
+              onClick={() => onAccept && onAccept(id)}
+              className="px-3 py-1 bg-[#f9c7c7] text-[#593A27] rounded-full text-xs font-medium hover:bg-[#f9c7c7]/80"
+            >
+              Accept
+            </button>
+            <button 
+              onClick={() => onReject && onReject(id)}
+              className="px-3 py-1 bg-[#fbeee0] text-[#593A27] rounded-full text-xs font-medium hover:bg-[#fbeee0]/80"
+            >
+              Decline
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -36,8 +56,14 @@ const ChatItem = ({ name, lastMessage, time, avatar }: ChatItemProps) => {
 export default function ChatsScreen() {
   const [activeTab, setActiveTab] = useState<'messages' | 'requests'>('messages');
   
-  // Demo data for chat list
-  const chats = [
+  // Demo data for friends/approved contacts
+  const [chats, setChats] = useState<Array<{
+    id?: string;
+    name: string;
+    lastMessage: string;
+    time: string;
+    avatar: string;
+  }>>([
     {
       name: "First Year Feels",
       lastMessage: "Reacted 👍 to your message",
@@ -80,7 +106,42 @@ export default function ChatsScreen() {
       time: "7h",
       avatar: "https://i.imgur.com/5ksRGJ4.png"
     }
-  ];
+  ]);
+  
+  // Demo data for chat requests
+  const [requests, setRequests] = useState([
+    {
+      id: "req1",
+      name: "Meera Kapoor",
+      lastMessage: "Hi, I saw your post in the college group!",
+      time: "2h",
+      avatar: "https://randomuser.me/api/portraits/women/33.jpg"
+    },
+    {
+      id: "req2",
+      name: "Dev Patel",
+      lastMessage: "Hey, I'm a friend of Rahul. Can we chat?",
+      time: "5h",
+      avatar: "https://randomuser.me/api/portraits/men/36.jpg"
+    }
+  ]);
+
+  const handleAcceptRequest = (id: string) => {
+    // Find the request
+    const request = requests.find(req => req.id === id);
+    if (!request) return;
+    
+    // Add to approved chats
+    setChats([...chats, request]);
+    
+    // Remove from requests
+    setRequests(requests.filter(req => req.id !== id));
+  };
+
+  const handleRejectRequest = (id: string) => {
+    // Remove from requests
+    setRequests(requests.filter(req => req.id !== id));
+  };
 
   return (
     <div className="flex flex-col h-full bg-white">
@@ -130,9 +191,10 @@ export default function ChatsScreen() {
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'messages' ? (
           <div className="py-2 px-3">
-            {chats.map((chat, index) => (
+            {chats.map((chat) => (
               <ChatItem 
-                key={index} 
+                key={chat.id || chat.name} 
+                id={chat.id || chat.name}
                 name={chat.name} 
                 lastMessage={chat.lastMessage} 
                 time={chat.time} 
@@ -141,14 +203,32 @@ export default function ChatsScreen() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center p-6">
-            <div className="w-16 h-16 bg-[#fbeee0] rounded-full flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-[#593A27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-[#593A27] mb-1">No Requests</h3>
-            <p className="text-sm text-[#b89e8f] max-w-xs">When someone wants to message you, their request will appear here.</p>
+          <div className="py-2 px-3">
+            {requests.length > 0 ? (
+              requests.map((request) => (
+                <ChatItem 
+                  key={request.id} 
+                  id={request.id}
+                  name={request.name} 
+                  lastMessage={request.lastMessage} 
+                  time={request.time} 
+                  avatar={request.avatar} 
+                  isRequest={true}
+                  onAccept={handleAcceptRequest}
+                  onReject={handleRejectRequest}
+                />
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center h-64 text-center p-6">
+                <div className="w-16 h-16 bg-[#fbeee0] rounded-full flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-[#593A27]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-[#593A27] mb-1">No Requests</h3>
+                <p className="text-sm text-[#b89e8f] max-w-xs">When someone wants to message you, their request will appear here.</p>
+              </div>
+            )}
           </div>
         )}
       </div>

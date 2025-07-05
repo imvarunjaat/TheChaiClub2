@@ -8,6 +8,7 @@ import RoomsScreen from './components/RoomsScreen';
 import ChatsScreen from './components/ChatsScreen';
 import ParticlesBackground from './components/ParticlesBackground';
 import ChatRoomPage from './components/ChatRoomPage';
+import CollegeRoomPage from './components/CollegeRoomPage';
 
 interface ChatRoomCardProps {
   title: string;
@@ -110,11 +111,11 @@ function ChaiCup({ opacity }: ChaiCupProps) {
 
 export default function Home() {
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
-  const [activeView, setActiveView] = useState<'home' | 'rooms' | 'chats' | 'chatroom'>('home');
+  const [activeView, setActiveView] = useState<'home' | 'rooms' | 'chats' | 'chatroom' | 'college'>('home');
   const [activeChatRoom, setActiveChatRoom] = useState<{id: string, name: string} | null>(null);
   
   // Function to handle navigation changes
-  const handleNavigation = (view: 'home' | 'rooms' | 'chats') => {
+  const handleNavigation = (view: 'home' | 'rooms' | 'chats' | 'college') => {
     setActiveView(view);
   };
   
@@ -196,7 +197,19 @@ export default function Home() {
                 <span className="text-xs font-medium mt-1 text-[#593A27] sm:block hidden">Chats</span>
                 <span className="text-[10px] font-medium mt-0.5 text-[#593A27] block sm:hidden">Chats</span>
               </button>
-
+              <button 
+                title="Your College" 
+                onClick={() => handleNavigation('college')}
+                className={`focus:outline-none hover:scale-110 transition mobile-nav-item touch-target flex flex-col items-center ${activeView === 'college' ? 'active' : ''}`}
+              >
+                <svg className="w-7 h-7" fill="none" stroke="#593A27" strokeWidth="1.7" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                </svg>
+                <span className="text-xs font-medium mt-1 text-[#593A27] sm:block hidden">Yours</span>
+                <span className="text-[10px] font-medium mt-0.5 text-[#593A27] block sm:hidden">Yours</span>
+              </button>
             </nav>
             <div className="sm:mt-auto sm:pt-10 hidden sm:block">
               <span className="text-xs text-[#b89e8f]">v1.0</span>
@@ -212,6 +225,10 @@ export default function Home() {
             {/* Rooms Screen (Sliding Panel) */}
             <div className={`absolute top-0 left-0 right-0 bottom-0 bg-white transform transition-transform duration-300 ease-in-out z-20 ${activeView === 'rooms' ? 'translate-x-0' : 'translate-x-full'}`}>
               <RoomsScreen onJoinRoom={handleJoinRoom} />
+            </div>
+            {/* College Room Screen (Sliding Panel) */}
+            <div className={`fixed top-0 left-0 right-0 bottom-0 bg-white transform transition-transform duration-300 ease-in-out z-40 ${activeView === 'college' ? 'translate-x-0' : 'translate-x-full'}`}>
+              <CollegeRoomPage onBack={() => handleNavigation('home')} />
             </div>
             {/* Chat Room Screen (Sliding Panel) */}
             <div className={`fixed top-0 left-0 right-0 bottom-0 bg-white transform transition-transform duration-300 ease-in-out z-40 ${activeView === 'chatroom' ? 'translate-x-0' : 'translate-x-full'}`}>

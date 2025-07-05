@@ -22,6 +22,10 @@ export default function ChatRoomPage({ roomId, roomName, onBack }: ChatRoomPageP
   const [newMessage, setNewMessage] = useState('');
   const [onlineUsers, setOnlineUsers] = useState<{id: string, name: string, avatar: string}[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  
+  // Common emojis
+  const emojis = ['😊', '😂', '❤️', '👍', '🙏', '🎉', '😎', '🔥', '✨', '🤔'];
 
   // Mock data for demonstration
   useEffect(() => {
@@ -89,8 +93,14 @@ export default function ChatRoomPage({ roomId, roomName, onBack }: ChatRoomPageP
     
     setMessages([...messages, newMsg]);
     setNewMessage('');
+    setShowEmojiPicker(false); // Hide emoji picker after sending
     
     // In a real app, you would send this message to your backend/API
+  };
+  
+  const handleEmojiClick = (emoji: string) => {
+    setNewMessage(newMessage + emoji);
+    setShowEmojiPicker(false);
   };
 
   const formatTime = (date: Date) => {
@@ -120,10 +130,7 @@ export default function ChatRoomPage({ roomId, roomName, onBack }: ChatRoomPageP
             </div>
             <div className="ml-3">
               <h2 className="text-lg font-bold text-[#593A27]">{roomName}</h2>
-              <p className="text-xs text-[#b89e8f] flex items-center">
-                <span className="inline-block w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse"></span>
-                {onlineUsers.length} online
-              </p>
+              
             </div>
           </div>
         </div>
@@ -222,46 +229,55 @@ export default function ChatRoomPage({ roomId, roomName, onBack }: ChatRoomPageP
       
       {/* Message Input */}
       <div className="border-t border-[#fbeee0] p-4 bg-white shadow-lg">
-        <form onSubmit={handleSendMessage} className="flex items-center bg-[#f9f9f9] rounded-full px-3 shadow-inner">
-          <button 
-            type="button"
-            className="p-2 text-[#b89e8f] hover:text-[#593A27] transition-all duration-300 transform hover:scale-110"
-            title="Add attachment"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-            </svg>
-          </button>
-          <input
-            type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 py-3 px-3 bg-transparent rounded-full focus:outline-none text-[#593A27] placeholder-[#b89e8f]"
-          />
-          <button 
-            type="button"
-            className="p-2 text-[#b89e8f] hover:text-[#593A27] transition-all duration-300 transform hover:scale-110 mx-1"
-            title="Add emoji"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-              <line x1="9" y1="9" x2="9.01" y2="9"></line>
-              <line x1="15" y1="9" x2="15.01" y2="9"></line>
-            </svg>
-          </button>
-          <button 
-            type="submit"
-            className={`p-2 rounded-full transition-all duration-300 transform ${newMessage.trim() ? 'bg-[#f9c7c7] hover:bg-[#fbeee0] hover:scale-110' : 'bg-[#f9c7c7]/50 cursor-not-allowed'}`}
-            title="Send message"
-            disabled={!newMessage.trim()}
-          >
-            <svg className="w-5 h-5 text-[#593A27]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </button>
-        </form>
+        <div className="relative">
+          {showEmojiPicker && (
+            <div className="absolute bottom-16 right-0 z-10 bg-white rounded-lg p-2 shadow-lg border border-[#fbeee0]">
+              <div className="grid grid-cols-5 gap-2">
+                {emojis.map((emoji, index) => (
+                  <button
+                    key={index}
+                    className="w-10 h-10 text-xl hover:bg-[#fbeee0] rounded-md transition-colors"
+                    onClick={() => handleEmojiClick(emoji)}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <form onSubmit={handleSendMessage} className="flex items-center bg-[#f9f9f9] rounded-full px-3 shadow-inner">
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1 py-3 px-3 bg-transparent rounded-full focus:outline-none text-[#593A27] placeholder-[#b89e8f]"
+            />
+            <button 
+              type="button"
+              className="p-2 text-[#b89e8f] hover:text-[#593A27] transition-all duration-300 transform hover:scale-110 mx-1"
+              title="Add emoji"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                <line x1="15" y1="9" x2="15.01" y2="9"></line>
+              </svg>
+            </button>
+            <button 
+              type="submit"
+              className={`p-2 rounded-full transition-all duration-300 transform ${newMessage.trim() ? 'bg-[#f9c7c7] hover:bg-[#fbeee0] hover:scale-110' : 'bg-[#f9c7c7]/50 cursor-not-allowed'}`}
+              title="Send message"
+              disabled={!newMessage.trim()}
+            >
+              <svg className="w-5 h-5 text-[#593A27]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
