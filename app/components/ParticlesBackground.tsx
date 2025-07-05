@@ -54,7 +54,7 @@ export default function ParticlesBackground() {
     ];
 
     // Create particles (more dense)
-    const particleCount = Math.floor(window.innerWidth * window.innerHeight / 5000);
+    const particleCount = Math.floor(window.innerWidth * window.innerHeight / 4000);
     
     for (let i = 0; i < particleCount; i++) {
       const colorIndex = Math.floor(Math.random() * colors.length);
@@ -63,7 +63,7 @@ export default function ParticlesBackground() {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: Math.random() * 4 + 2,
+        size: Math.random() * 5 + 2, // Larger particles
         speedX: (Math.random() * 0.22 - 0.11) * 1.3, // Small, safe increase
         speedY: (Math.random() * 0.22 - 0.11) * 1.3, // Small, safe increase
         color: colors[colorIndex],
@@ -98,9 +98,9 @@ export default function ParticlesBackground() {
         const dy = particle.y - mousePos.current.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        // Add repulsion force when near cursor (magnetic effect)
-        if (distance < 100) {
-          const force = (100 - distance) / 20;
+        // Add repulsion force when near cursor (stronger magnetic effect)
+        if (distance < 150) {
+          const force = (150 - distance) / 15;
           const angle = Math.atan2(dy, dx);
           
           particle.x += Math.cos(angle) * force;
@@ -119,7 +119,7 @@ export default function ParticlesBackground() {
         
         // More dramatic pulsing for sparkle effect
         particle.alpha += (particle.targetAlpha - particle.alpha) * 0.1;
-        if (Math.random() < 0.01) {
+        if (Math.random() < 0.02) { // Increased frequency
           particle.targetAlpha = (Math.random() * 0.5 + 0.3) * particle.sparkleIntensity;
         }
         
@@ -127,11 +127,11 @@ export default function ParticlesBackground() {
         ctx.save();
         
         // Sparkle effect (random bright flashes)
-        if (Math.random() < 0.02) {
-          ctx.shadowBlur = 25;
-          ctx.globalAlpha = 0.8;
+        if (Math.random() < 0.03) { // Increased frequency
+          ctx.shadowBlur = 30; // Increased glow
+          ctx.globalAlpha = 0.9;
         } else {
-          ctx.shadowBlur = 15 * particle.sparkleIntensity;
+          ctx.shadowBlur = 20 * particle.sparkleIntensity; // Increased glow
           ctx.globalAlpha = particle.alpha;
         }
         
@@ -142,7 +142,7 @@ export default function ParticlesBackground() {
         ctx.fill();
         
         // Add occasional bright sparkle dots
-        if (Math.random() < 0.005) {
+        if (Math.random() < 0.008) { // Increased frequency
           ctx.beginPath();
           ctx.arc(
             particle.x + (Math.random() * 6 - 3),
@@ -151,7 +151,7 @@ export default function ParticlesBackground() {
             0,
             Math.PI * 2
           );
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
           ctx.fill();
         }
         

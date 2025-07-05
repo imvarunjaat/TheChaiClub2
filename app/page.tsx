@@ -7,6 +7,7 @@ import AuthModal from './components/AuthModal';
 import RoomsScreen from './components/RoomsScreen';
 import ChatsScreen from './components/ChatsScreen';
 import ParticlesBackground from './components/ParticlesBackground';
+import ChatRoomPage from './components/ChatRoomPage';
 
 interface ChatRoomCardProps {
   title: string;
@@ -16,10 +17,11 @@ interface ChatRoomCardProps {
   gradient: string;
   textColor: string;
   buttonColor: string;
+  onJoinRoom: (roomId: string, roomName: string) => void;
 }
 
 // Component for Chat Room Cards
-function ChatRoomCard({ title, description, onlineCount, icon, gradient, textColor, buttonColor }: ChatRoomCardProps) {
+function ChatRoomCard({ title, description, onlineCount, icon, gradient, textColor, buttonColor, onJoinRoom }: ChatRoomCardProps) {
   return (
     <div className={`flex flex-col bg-gradient-to-br ${gradient} rounded-2xl sm:rounded-3xl shadow-lg p-3 sm:p-5 md:p-7 transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl border border-[#faede4] group relative overflow-hidden mobile-card mobile-fade-in w-full h-full`}>
       <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-5 -mr-6 -mt-6 bg-current"></div>
@@ -56,7 +58,10 @@ function ChatRoomCard({ title, description, onlineCount, icon, gradient, textCol
             <span className="text-xs text-[#593A27] font-medium">+{onlineCount - 2}</span>
           </div>
         </div>
-        <button className={`${buttonColor} text-[#593A27] px-2 sm:px-4 md:px-5 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 hover:shadow-md hover:translate-y-[-2px] shadow-sm whitespace-nowrap mobile-btn`}>
+        <button 
+          onClick={() => onJoinRoom(title.toLowerCase().replace(/\s+/g, '-'), title)}
+          className={`${buttonColor} text-[#593A27] px-2 sm:px-4 md:px-5 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 hover:shadow-md hover:translate-y-[-2px] shadow-sm whitespace-nowrap mobile-btn`}
+        >
           Join Room
         </button>
       </div>
@@ -105,11 +110,24 @@ function ChaiCup({ opacity }: ChaiCupProps) {
 
 export default function Home() {
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
-  const [activeView, setActiveView] = useState<'home' | 'rooms' | 'chats'>('home');
+  const [activeView, setActiveView] = useState<'home' | 'rooms' | 'chats' | 'chatroom'>('home');
+  const [activeChatRoom, setActiveChatRoom] = useState<{id: string, name: string} | null>(null);
   
   // Function to handle navigation changes
   const handleNavigation = (view: 'home' | 'rooms' | 'chats') => {
     setActiveView(view);
+  };
+  
+  // Function to handle joining a chat room
+  const handleJoinRoom = (roomId: string, roomName: string) => {
+    setActiveChatRoom({ id: roomId, name: roomName });
+    setActiveView('chatroom');
+  };
+  
+  // Function to handle going back from a chat room
+  const handleBackFromChatRoom = () => {
+    setActiveView('home');
+    setActiveChatRoom(null);
   };
   
   useEffect(() => {
@@ -174,7 +192,7 @@ export default function Home() {
                 onClick={() => handleNavigation('chats')}
                 className={`focus:outline-none hover:scale-110 transition mobile-nav-item touch-target flex flex-col items-center ${activeView === 'chats' ? 'active' : ''}`}
               >
-                <svg className="w-7 h-7" fill="none" stroke="#593A27" strokeWidth="1.7" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h12a2 2 0 012 2z"></path></svg>
+                <svg className="w-7 h-7" fill="none" stroke="#593A27" strokeWidth="1.7" viewBox="0 0 24 24"><path d="M21 15a2 2 0 012-2H7l-4 4V5a2 2 0 012-2h12a2 2 0 012 2v9"></path></svg>
                 <span className="text-xs font-medium mt-1 text-[#593A27] sm:block hidden">Chats</span>
                 <span className="text-[10px] font-medium mt-0.5 text-[#593A27] block sm:hidden">Chats</span>
               </button>
@@ -193,7 +211,17 @@ export default function Home() {
             </div>
             {/* Rooms Screen (Sliding Panel) */}
             <div className={`absolute top-0 left-0 right-0 bottom-0 bg-white transform transition-transform duration-300 ease-in-out z-20 ${activeView === 'rooms' ? 'translate-x-0' : 'translate-x-full'}`}>
-              <RoomsScreen />
+              <RoomsScreen onJoinRoom={handleJoinRoom} />
+            </div>
+            {/* Chat Room Screen (Sliding Panel) */}
+            <div className={`fixed top-0 left-0 right-0 bottom-0 bg-white transform transition-transform duration-300 ease-in-out z-40 ${activeView === 'chatroom' ? 'translate-x-0' : 'translate-x-full'}`}>
+              {activeChatRoom && (
+                <ChatRoomPage 
+                  roomId={activeChatRoom.id} 
+                  roomName={activeChatRoom.name} 
+                  onBack={handleBackFromChatRoom} 
+                />
+              )}
             </div>
             {/* Top Navbar */}
             <header className="w-full flex flex-wrap justify-between items-center px-3 sm:px-6 md:px-8 py-2 sm:py-4 bg-white/70 backdrop-blur-lg shadow-sm sm:rounded-bl-3xl border-b border-[#fbeee0] sticky top-[50px] sm:top-0 z-[5] mobile-glass">
@@ -232,10 +260,11 @@ export default function Home() {
                     title="First Year Feels"
                     description="Share your freshie confessions, college hacks & awkward stories."
                     onlineCount={124}
-                    icon={<svg className="w-6 h-6 text-[#a07764]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 012 2h12a2 2 0 012-2v-2"/><circle cx="12" cy="11" r="8"/></svg>}
+                    icon={<svg className="w-6 h-6 text-[#a07764]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 012-2h12a2 2 0 012 2v-2"/><circle cx="12" cy="11" r="8"/></svg>}
                     gradient="from-[#fff5f2] to-[#f9c7c7]/40"
                     textColor="text-[#a07764]"
                     buttonColor="bg-[#f9c7c7] hover:bg-[#fbeee0]"
+                    onJoinRoom={handleJoinRoom}
                   />
                   <ChatRoomCard 
                     title="Breakup"
@@ -245,6 +274,7 @@ export default function Home() {
                     gradient="from-[#fde5ec] to-[#faede4]"
                     textColor="text-[#e85a71]"
                     buttonColor="bg-[#fde5ec] hover:bg-[#f9c7c7]"
+                    onJoinRoom={handleJoinRoom}
                   />
                   {/* Add more ChatRoomCard components for other rooms */}
                   <ChatRoomCard 
@@ -255,6 +285,7 @@ export default function Home() {
                     gradient="from-[#fbeee0] via-[#e2f6ef] to-[#fff5f2]"
                     textColor="text-[#35b8a6]"
                     buttonColor="bg-[#e2f6ef] hover:bg-[#fbeee0]"
+                    onJoinRoom={handleJoinRoom}
                   />
                   <ChatRoomCard 
                     title="Gossips"
@@ -264,6 +295,7 @@ export default function Home() {
                     gradient="from-[#f9c7c7]/70 via-[#fffbe9] to-[#ffe8c7]"
                     textColor="text-[#b89e8f]"
                     buttonColor="bg-[#ffe066]/70 hover:bg-[#fffbe9]"
+                    onJoinRoom={handleJoinRoom}
                   />
                   <ChatRoomCard 
                     title="Exam Burnout Café"
@@ -273,6 +305,7 @@ export default function Home() {
                     gradient="from-[#fbeee0] to-[#ede7fe]"
                     textColor="text-[#a07764]"
                     buttonColor="bg-[#ede7fe] hover:bg-[#fbeee0]"
+                    onJoinRoom={handleJoinRoom}
                   />
                   <ChatRoomCard 
                     title="Hostel Heartbreak Club"
@@ -282,6 +315,7 @@ export default function Home() {
                     gradient="from-[#faede4] via-[#f9c7c7]/30 to-[#fff5f2]"
                     textColor="text-[#e85a71]"
                     buttonColor="bg-[#fbeee0] hover:bg-[#f9c7c7]"
+                    onJoinRoom={handleJoinRoom}
                   />
                 </div>
               </section>
