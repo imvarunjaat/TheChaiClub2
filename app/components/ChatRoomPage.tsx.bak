@@ -83,7 +83,6 @@ export default function ChatRoomPage({ roomId, roomName, onBack }: ChatRoomPageP
           <button 
             onClick={onBack}
             className="mr-3 p-2 hover:bg-[#f9c7c7]/20 rounded-full transition"
-            title="Back to chat list"
           >
             <svg className="w-5 h-5 text-[#593A27]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -96,7 +95,7 @@ export default function ChatRoomPage({ roomId, roomName, onBack }: ChatRoomPageP
         </div>
         
         <div>
-          <button className="p-2 hover:bg-[#f9c7c7]/20 rounded-full transition" title="Room options">
+          <button className="p-2 hover:bg-[#f9c7c7]/20 rounded-full transition">
             <svg className="w-5 h-5 text-[#593A27]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
             </svg>
@@ -146,8 +145,8 @@ export default function ChatRoomPage({ roomId, roomName, onBack }: ChatRoomPageP
                       <div className="flex-shrink-0 self-end">
                         <div className="relative">
                           <Image 
-                            src={msg.user.avatar_url || '/default-avatar.png'}
-                            alt={msg.user.name || 'User'}
+                            src={msg.user.avatar_url}
+                            alt={msg.user.name}
                             width={36}
                             height={36}
                             className="rounded-full border-2 border-white shadow-sm"
@@ -214,7 +213,6 @@ export default function ChatRoomPage({ roomId, roomName, onBack }: ChatRoomPageP
             <button 
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
               className="flex-shrink-0 text-[#b89e8f] hover:text-[#593A27] mr-2"
-              title="Open emoji picker"
             >
               <svg className="w-5 h-5" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 100-16 8 8 0 000 16zm-5-7h2a3 3 0 106 0h2a5 5 0 01-10 0z"/>

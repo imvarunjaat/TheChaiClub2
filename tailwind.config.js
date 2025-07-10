@@ -6,7 +6,16 @@ module.exports = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        gothic: ['UnifrakturMaguntia', 'serif'],
+      },
+      colors: {
+        pink: {
+          400: '#f9c7c7',
+        }
+      },
+    },
   },
   plugins: [],
 } 

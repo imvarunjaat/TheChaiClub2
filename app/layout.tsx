@@ -1,10 +1,12 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
+import { Metadata } from 'next'
+import Providers from './providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
-  title: 'TheChaiClub Dashboard',
+export const metadata: Metadata = {
+  title: 'ogadda Dashboard',
   description: 'A cozy space for college students to connect and chat',
 }
 
@@ -22,7 +24,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} bg-gradient-to-br from-[#fff5f2] via-[#faede4] to-[#fbeee0] min-h-screen text-[#593A27]`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -11,24 +12,42 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { signIn, signUp } = useAuth();
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
 
     // Validate .edu email
     if (!email.endsWith('.edu')) {
       setError('Please use a valid .edu email address');
+      setIsSubmitting(false);
       return;
     }
 
-    // Here you would typically call an authentication API
-    console.log(isLogin ? 'Login attempt' : 'Signup attempt', { email, password, name });
-    
-    // Close the modal after successful submission (mock success for now)
-    onClose();
+    try {
+      if (isLogin) {
+        // Handle login
+        const { error: signInError } = await signIn(email, password);
+        if (signInError) throw signInError;
+      } else {
+        // Handle signup
+        const { error: signUpError } = await signUp(email, password, name);
+        if (signUpError) throw signUpError;
+      }
+      
+      // Close the modal after successful submission
+      onClose();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -46,7 +65,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </svg>
           </button>
           <h2 className="text-2xl font-bold text-[#593A27] text-center">
-            {isLogin ? 'Welcome Back!' : 'Join TheChaiClub'}
+            {isLogin ? 'Welcome Back!' : 'Join ogadda'}
           </h2>
         </div>
         
@@ -105,9 +124,20 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-[#f9c7c7] via-[#fbeee0] to-[#b89e8f] text-[#593A27] py-2 rounded-xl font-bold shadow-md hover:shadow-lg transition transform hover:scale-[1.02] focus:outline-none"
+              disabled={isSubmitting}
+              className={`w-full bg-gradient-to-r from-[#f9c7c7] via-[#fbeee0] to-[#b89e8f] text-[#593A27] py-2 rounded-xl font-bold shadow-md transition transform ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-lg hover:scale-[1.02]'} focus:outline-none`}
             >
-              {isLogin ? 'Login' : 'Sign Up'}
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-[#593A27]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </span>
+              ) : (
+                isLogin ? 'Login' : 'Sign Up'
+              )}
             </button>
           </form>
           
